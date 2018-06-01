@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+
+from __future__ import print_function
 import numpy as np
 import math
 import matplotlib.pyplot as plt
+import random
 import scipy.signal as sig
 
 PI = math.pi
@@ -9,9 +12,8 @@ PI = math.pi
 
 def decorater(func):
     def wrapper(*args, **kwargs):
-        print "{} has started!".format(func.__name__)
+        print("[\033[0;31mINFO\033[0m] {} has started!".format(func.__name__))
         return func(*args, **kwargs)
-
     return wrapper
 
 
@@ -51,8 +53,4 @@ class BaseRadar(Transmitter):
         BaseRadar._count += 1
 
 
-radar_list = [BaseRadar(1, 1) for i in range(10)]
-for radar in radar_list:
-    print radar.no
-plt.plot(radar.trans_wave())
-plt.show()
+
