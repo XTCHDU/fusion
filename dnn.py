@@ -3,7 +3,7 @@ import numpy as np
 def dnn(input_x, input_y, test_x, test_y):
     # Parameters
     learning_rate = 0.01
-    training_epochs = 1500
+    training_epochs = 15000000
     display_step = 1
 
     # Network Parameters
@@ -39,9 +39,9 @@ def dnn(input_x, input_y, test_x, test_y):
         # Hidden fully connected layer with 256 neurons
         layer_2 = tf.add(tf.matmul(layer_1, weights['h2']), biases['b2'])
         layer_3 = tf.add(tf.matmul(layer_2, weights['h3']), biases['b3'])
-        layer_4 = tf.nn.relu(layer_3)
+        layer_4 = tf.nn.relu6(layer_3)
         # Output fully connected layer with a neuron for each class
-        out_layer = tf.matmul(layer_4, weights['out']) + biases['out']
+        out_layer = tf.nn.sigmoid(tf.matmul(layer_4, weights['out']) + biases['out'])
         return out_layer
 
     # Construct model
@@ -72,16 +72,17 @@ def dnn(input_x, input_y, test_x, test_y):
             if epoch % 10 ==0:
 
                 saver.save(sess, "./DNN_Model/DNN", global_step=epoch)
+                pred = logits  # Apply softmax to logits
+                # Calculate accuracy
+                accuracy = tf.losses.mean_squared_error(Y, pred)
+                print("Accuracy:", accuracy.eval({X: test_x, Y: test_y}))
 
         print("Optimization Finished!")
 
         # Test model
-        pred = logits  # Apply softmax to logits
-        # Calculate accuracy
-        accuracy = tf.losses.mean_squared_error(Y,pred)
-        print("Accuracy:", accuracy.eval({X: test_x, Y: test_y}))
+
 
 x_list = np.load('x_list.npy')
 y_list = np.load('y_list.npy')
 
-dnn(input_x = x_list[:200000],input_y = y_list[:200000],test_x=x_list[200000:],test_y=y_list[200000:])
+dnn(input_x = x_list[:150000],input_y = y_list[:150000],test_x=x_list[150000:],test_y=y_list[150000:])
