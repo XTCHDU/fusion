@@ -1,5 +1,8 @@
 import numpy as np
 from radar import decorater
+import main
+import random
+import method
 
 class HammersteinWiener:
     B = []
@@ -10,12 +13,22 @@ class HammersteinWiener:
         self.B = B
         self.b = b
         self.h = h
+
     @decorater
     def run(self, x):
         v = self.f(x)
         u = self.H(v)
         y = self.g(u)
         return y
+
+    def setB(self, index, value):
+        self.B[index] = value
+
+    def setb(self, index, value):
+        self.b[index] = value
+
+    def seth(self, index, value):
+        self.h[index] = value
 
     def f(self, x):
         # x = np.array(x)
@@ -46,10 +59,22 @@ class HammersteinWiener:
                 temp += self.h[i] * x[n - i]
             y[n] = temp
         return y
+    def para_init(self):
+        self.b[0] = 1
+        self.B[0] = 1
+        self.h[0] = 1
     @decorater
     def find_way(self, x, y):
-        est = HammersteinWiener(B=[0 for _ in range(len(self.B))], b=[0 for _ in range(len(self.b))],
-                                h=[0 for _ in range(len(self.h))])
+        MAX_PARAM_LOW = main.MAX_PARAM_LOW
+        MAX_PARAM_HIGH = main.MAX_PARAM_HIGH
+        est = HammersteinWiener(B=[random.uniform(MAX_PARAM_LOW, MAX_PARAM_HIGH) for _ in range(len(self.B))],
+                                b=[random.uniform(MAX_PARAM_LOW, MAX_PARAM_HIGH) for _ in range(len(self.b))],
+                                h=[random.uniform(MAX_PARAM_LOW, MAX_PARAM_HIGH) for _ in range(len(self.h))])
+        est.setB(0, 1)
+        est.setb(0, 1)
+        est.seth(0, 1)
+
+
 
     def __str__(self):
         ans = ""
