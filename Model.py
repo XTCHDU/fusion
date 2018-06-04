@@ -3,7 +3,12 @@ from radar import decorater
 import main
 import random
 import method
-
+def scaler(x):
+    x = np.array(x)
+    xmin = np.min(x)
+    xmax = np.max(x)
+    x = (x-xmin)/(xmax-xmin)
+    return x
 class HammersteinWiener:
     B = []
     b = []
@@ -19,6 +24,8 @@ class HammersteinWiener:
         v = self.f(x)
         u = self.H(v)
         y = self.g(u)
+        y = scaler(y)
+        print(max(y))
         return y
 
     def setB(self, index, value):
