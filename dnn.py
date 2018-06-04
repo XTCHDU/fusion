@@ -1,8 +1,11 @@
 import tensorflow as tf
 import numpy as np
+from sklearn.metrics import mean_squared_error
+from functools import reduce
+
 def dnn(input_x, input_y, test_x, test_y):
     # Parameters
-    learning_rate = 0.001
+    learning_rate = 0.0002
     training_epochs = 15000000
     display_step = 1
     batch_size = 1000
@@ -65,8 +68,9 @@ def dnn(input_x, input_y, test_x, test_y):
     # Initializing the variables
     init = tf.global_variables_initializer()
     saver = tf.train.Saver(max_to_keep=4)
+
     with tf.Session() as sess:
-        saver.restore(sess, "./DNN_Model/DNN-22030")
+        saver.restore(sess, "./DNN_Model/DNN-13800")
 
         # Training cycle
         batch = 0
@@ -81,13 +85,23 @@ def dnn(input_x, input_y, test_x, test_y):
             # Display logs per epoch step
             if epoch % display_step == 0:
                 print("Epoch:", '%04d' % (epoch+1), "cost={:.9f}".format(avg_cost))
-            if epoch % 10 ==0:
+            if epoch % 100 ==0:
 
                 saver.save(sess, "./DNN_Model/DNN", global_step=epoch)
                 pred = logits  # Apply softmax to logits
                 # Calculate accuracy
                 accuracy = tf.losses.mean_squared_error(Y, pred)
-                print("Accuracy:", accuracy.eval({X: test_x[:500], Y: test_y[:500]}))
+                #print("Accuracy:", logits.eval({X: test_x[:10], Y: test_y[:10]}))
+                est = logits.eval({X: test_x, Y: test_y})
+                index = 0
+                ans = map(mean_squared_error, est, test_y)
+                ans_index = 0
+                ans_value = 0
+                for index ,value in enumerate(ans):
+                    if value>ans_value:
+                        ans_value = value
+                        ans_index = index
+                print("Acc:",accuracy.eval({X:test_x,Y:test_y}),ans_value)
             batch = (batch+batch_size)%input_x.shape[0]
 
         print("Optimization Finished!")
@@ -98,4 +112,4 @@ def dnn(input_x, input_y, test_x, test_y):
 x_list = np.load('x_list.npy')
 y_list = np.load('y_list.npy')
 
-dnn(input_x = x_list[:20000],input_y = y_list[:20000],test_x=x_list[20000:],test_y=y_list[20000:])
+dnn(input_x = x_list[:40000],input_y = y_list[:40000],test_x=x_list[40000:],test_y=y_list[40000:])

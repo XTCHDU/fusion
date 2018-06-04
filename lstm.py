@@ -7,15 +7,15 @@ def lstm(input_x, input_y, test_x, test_y):
     learning_rate = 0.001
     training_epochs = 15000000
     display_step = 1
-    batch_size = 20
+    batch_size = 1000
 
     num_input = input_x.shape[1]  # MNIST data input (img shape: 28*28)
-    timesteps = 2000  # timesteps
+    timesteps = 20  # timesteps
     num_hidden = 256  # hidden layer num of features
     num_classes = input_y.shape[1]  # MNIST total classes (0-9 digits)
 
     # tf Graph input
-    X = tf.placeholder("float", [None, timesteps ,1])
+    X = tf.placeholder("float", [None, timesteps ,100])
     Y = tf.placeholder("float", [None, num_classes])
 
     # Define weights
@@ -60,7 +60,7 @@ def lstm(input_x, input_y, test_x, test_y):
             # Loop over all batches
             # Run optimization op (backprop) and cost op (to get loss value)
             batch_x = input_x[batch:batch+batch_size]
-            batch_x = batch_x.reshape((batch_size,2000,1))
+            batch_x = batch_x.reshape((batch_size,20,100))
             _, c = sess.run([train_op, loss_op], feed_dict={X: batch_x,
                                                             Y: input_y[batch:batch+batch_size]})
             # Compute average loss
@@ -75,7 +75,7 @@ def lstm(input_x, input_y, test_x, test_y):
                 # Calculate accuracy
                 accuracy = tf.losses.mean_squared_error(Y, pred)
                 batch_x = test_x[:1000]
-                batch_x = batch_x.reshape((1000, 2000, 1))
+                batch_x = batch_x.reshape((1000, 20, 100))
                 print("Accuracy:", accuracy.eval({X: batch_x, Y: test_y[:1000]}))
             batch = (batch+batch_size)%input_x.shape[0]
 
@@ -87,4 +87,4 @@ def lstm(input_x, input_y, test_x, test_y):
 x_list = np.load('x_list.npy')
 y_list = np.load('y_list.npy')
 
-lstm(input_x = x_list[:20000],input_y = y_list[:20000],test_x=x_list[20000:],test_y=y_list[20000:])
+lstm(input_x = x_list[:40000],input_y = y_list[:40000],test_x=x_list[40000:],test_y=y_list[40000:])
