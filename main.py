@@ -22,8 +22,9 @@ if __name__ == "__main__":
 
     x_list = []
     y_list = []
-    epoch = 300000
+    epoch = 50000
     for _ in range(epoch):
+        print(_)
         est = Model.HammersteinWiener(B=[random.uniform(MAX_PARAM_LOW, MAX_PARAM_HIGH) for _ in range(3)],
                                       b=[random.uniform(MAX_PARAM_LOW, MAX_PARAM_HIGH) for _ in range(3)],
                                       h=[random.uniform(MAX_PARAM_LOW, MAX_PARAM_HIGH) for _ in range(3)])
@@ -36,5 +37,5 @@ if __name__ == "__main__":
     np.save("./y_list.npy", y_list)
     ester = method.ML()
     ester.train(x_list[:epoch * 2 / 3], y_list[:epoch * 2 / 3])
-    print ester.mse(ester.predict(x_list[epoch * 2 / 3:]), y_list[epoch * 2 / 3:])
+    print(ester.mse(ester.predict(x_list[epoch * 2 / 3:]), y_list[epoch * 2 / 3:]))
     ester.save("./model/Gradient_{}.m".format(epoch))
