@@ -120,7 +120,7 @@ def dnn(input_x, input_y, test_x, test_y):
 x_list = np.load('x_list.npy')
 y_list = np.load('y_list.npy')
 
-dnn(input_x = x_list[:40000],input_y = y_list[:40000],test_x=x_list[40000:],test_y=y_list[40000:])
+#dnn(input_x = x_list[:40000],input_y = y_list[:40000],test_x=x_list[40000:],test_y=y_list[40000:])
 with tf.Session() as sess:
 
     new_saver = tf.train.import_meta_graph('./DNN_Model/DNN-300.meta')
@@ -133,17 +133,35 @@ with tf.Session() as sess:
     # 因为y中有placeholder，所以sess.run(y)的时候还需要用实际待预测的样本以及相应的参数来填充这些placeholder，而这些需要通过graph的get_operation_by_name方法来获取。
 
     # 使用y进行预测
-    origin = x_list[:5]
-    origin[:,1000:]*=0.5
+    origin = x_list
     ans = sess.run(y, feed_dict={"Placeholder:0": np.reshape(origin, [-1, 2000])})
-    print(ans)
+    print("参数总MSE:",mean_squared_error(ans,y_list)*9/6)
     #print(mean_squared_error(ans,y_list)*9/6)
     import matplotlib.pyplot as plt
     import Model
+    import pandas as pd
+    data = []
+    from pylab import mpl
+
+    mpl.rcParams['font.sans-serif'] = ['FangSong']  # 指定默认字体
+    mpl.rcParams['axes.unicode_minus'] = False  # 解决保存图像是负号'-'显示为方块的问题
     for i in range(5):
+        print("第%d组:"%(i+1))
+        print("真实参数:",y_list[i])
+        print("网络输出参数:",ans[i])
         testmodel = Model.HammersteinWiener(B=ans[i,:3],b=ans[i,3:6],h=ans[i,6:])
         plt.figure()
-        plt.plot(np.array(origin[i][1000:]))
-        plt.plot(testmodel.run(np.array(origin[i][:1000])))
-        print(mean_squared_error(np.array(origin[i][1000:]),testmodel.run(np.array(origin[i][:1000]))))
+        plt.plot(np.array(origin[i][1000:]),color = "blue",label = "真实")
+        plt.plot(testmodel.run(np.array(origin[i][:1000])),color = "red",label = "估计")
+        plt.title("第%d组曲线对比"%(i+1))
+        plt.xlabel("采样点数")
+        plt.ylabel("幅度")
+        plt.legend(loc = "upper right")
+
+        print("参数MSE:{:.6f}".format(mean_squared_error(ans[i],y_list[i])*9/6))
+        print("曲线MSE:{:.6f}".format(mean_squared_error(Model.scaler(np.array(origin[i][1000:])),Model.scaler(testmodel.run(np.array(origin[i][:1000]))))))
+        data.append(y_list[i])
+        data.append(ans[i])
+    data = pd.DataFrame(data)
+    data.to_excel("./result.xlsx")
     plt.show()

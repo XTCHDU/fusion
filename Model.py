@@ -20,12 +20,12 @@ class HammersteinWiener:
         self.h = h
 
     @decorater
-    def run(self, x):
+    def run(self, x, norm = False):
         v = self.f(x)
         u = self.H(v)
         y = self.g(u)
-        y = scaler(y)
-        print(max(y))
+        if norm:
+            y = scaler(y)
         return y
 
     def setB(self, index, value):
