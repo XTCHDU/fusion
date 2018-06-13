@@ -132,7 +132,7 @@ def dnn_output(x_list):
         # 使用y进行预测
         origin = x_list
         ans = sess.run(y, feed_dict={"Placeholder:0": np.reshape(origin, [-1, 2000])})
-        ans = np.reshape(ans ,[-1])
+        ans = np.reshape(ans ,[-1,9])
         return ans
 
 

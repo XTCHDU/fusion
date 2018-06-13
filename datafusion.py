@@ -6,7 +6,8 @@ from sklearn.preprocessing import StandardScaler,MinMaxScaler
 from sklearn.metrics import mean_squared_error
 import pandas as pd
 import re
-
+from sklearn.svm import OneClassSVM
+from sklearn.ensemble import IsolationForest
 class Center:
     """
     数据中心类包括方法：
@@ -27,25 +28,39 @@ class Center:
     def load_data(self,param_list):
         self.data = pd.DataFrame(param_list).T
 
-    def search(self):
+    def search_kmeans(self):
         data = self.data
         scaler = MinMaxScaler()
         data = scaler.fit_transform(data)
         kmeans = KMeans(2)
-        data = kmeans.fit_transform(data)
-        return kmeans.labels_
-
+        distance = kmeans.fit_transform(data)
+        label = kmeans.labels_
+        distance_average = [0, 0]
+        for i in range(len(label)):
+            distance_average[label[i]] += distance[i][label[i]]
+        distance_average[0] /= len(label)-sum(label)
+        distance_average[1] /= sum(label)
+        if distance_average[0]<distance_average[1]:
+            label = [1-x for x in label]
+        print distance_average
+        return label
+    def search_one_class(self):
+        data =self.data
+        scaler = MinMaxScaler()
+        data = scaler.fit_transform(data)
+        svm = OneClassSVM(kernel='rbf',nu = 0.05)
+        svm.fit(data)
+        label = svm.predict(data)
+        label = [1 if x <0 else 0 for x in label]
+        return label
     def run(self):
         true_data = self.getKey()
-        est_data = self.search()
+        est_data = self.search_kmeans()
         count = 0
         for i in range(len(true_data)):
             if true_data[i] == est_data[i]:
                 count += 1
         rate = 1.0 * count / len(true_data)
-        if rate < 0.5:
-            est_data = [1-x for x in est_data]
-            rate = 1-rate
         print "分辨准确率为 %.3f%%"%(rate*100)
         for i in range(len(true_data)):
             print "第{}组 ，正确为{} , 估计为{}".format(i+1, ("欺骗干扰信号" if true_data[i]==1 else "真实回波信号" ) , ("欺骗干扰信号" if est_data[i]==1 else "真实回波信号" ))
