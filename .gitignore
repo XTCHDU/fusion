@@ -1,5 +1,3 @@
 *.pyc
-./DNN_Model
-./model
 x_list.npy
 y_list.npy
