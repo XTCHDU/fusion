@@ -11,8 +11,8 @@ import dnn
 MAX_PARAM_LOW = -1
 MAX_PARAM_HIGH = 1
 RADAR_NUM = 1
-TRUE_TARGET_NUM = 1000
-FALSE_TARGET_NUM = 1000
+TRUE_TARGET_NUM = 100
+FALSE_TARGET_NUM = 100
 FALSE_TRANS_POWER = 2
 
 def test():
@@ -87,7 +87,7 @@ def get_ans(SNR):
 if __name__ == "__main__":
     x = []
     y = []
-    for snr in range(-20, 30, 2):
+    for snr in range(30, 32, 2):
         rate = get_ans(snr)
         y.append(rate)
         x.append(snr)
