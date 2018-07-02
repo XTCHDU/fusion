@@ -50,7 +50,9 @@ class Center:
             label = [1-x for x in label]
         data = np.array(data)
         plt.figure()
-        plt.scatter(data[:][0],data[:][1])
+        for i in range(data.shape[0]):
+            plt.scatter(data[i][0],data[i][1],label=label[i])
+        #plt.title(u'聚类分析')
         #plt.show()
         return label
     def search_one_class(self):
